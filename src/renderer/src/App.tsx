@@ -1,6 +1,4 @@
-import Versions from './components/Versions'
-
-function App(): JSX.Element {
+function App() {
   return (
     <main>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
