@@ -1,10 +1,8 @@
 function App() {
   return (
-    <main>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <h1>Hello World! 🚀</h1>
-      </div>
-    </main>
+    <div className="flex justify-center items-center bg-slate-900 h-full">
+      <h1 className="text-4xl font-semibold">Hello World! 🚀</h1>
+    </div>
   )
 }
 
