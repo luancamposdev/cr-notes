@@ -9,13 +9,16 @@ import {
 import { useMarkdownEditor } from '@renderer/hooks/useMarkdownEditor'
 
 export const MarkdownEditor = () => {
-  const { selectedNote } = useMarkdownEditor()
+  const { editorRef, selectedNote, handleAutoSaving, handleBlur } = useMarkdownEditor()
 
   if (!selectedNote) return null
 
   return (
     <MDXEditor
       key={selectedNote.title}
+      ref={editorRef}
+      onChange={handleAutoSaving}
+      onBlur={handleBlur}
       markdown={selectedNote.content}
       plugins={[headingsPlugin(), listsPlugin(), quotePlugin(), markdownShortcutPlugin()]}
       contentEditableClassName="
