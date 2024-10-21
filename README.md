@@ -2,7 +2,7 @@
 <h1 align="center" style="font-weight: bold;">CRNotes 📝</h1>
 
 <p align="center">
-  <a href="#tech">Tecnologias</a> • 
+  <a href="#technologies">Tecnologias</a> • 
   <a href="#started">Como Começar</a>
 </p>
 
