@@ -1,11 +1,11 @@
+import { NoteContent, NoteInfo } from '@shared/models'
 import { atom } from 'jotai'
 import { unwrap } from 'jotai/utils'
-
-import type { NoteContent, NoteInfo } from '@shared/models'
 
 const loadNotes = async () => {
   const notes = await window.context.getNotes()
 
+  // sort them by most recently edited
   return notes.sort((a, b) => b.lastEditTime - a.lastEditTime)
 }
 
@@ -19,7 +19,7 @@ const selectedNoteAtomAsync = atom(async (get) => {
   const notes = get(notesAtom)
   const selectedNoteIndex = get(selectedNoteIndexAtom)
 
-  if (selectedNoteIndex === null || !notes) return null
+  if (selectedNoteIndex == null || !notes) return null
 
   const selectedNote = notes[selectedNoteIndex]
 
@@ -41,6 +41,32 @@ export const selectedNoteAtom = unwrap(
     }
 )
 
+export const saveNoteAtom = atom(null, async (get, set, newContent: NoteContent) => {
+  const notes = get(notesAtom)
+  const selectedNote = get(selectedNoteAtom)
+
+  if (!selectedNote || !notes) return
+
+  // save on disk
+  await window.context.writeNote(selectedNote.title, newContent)
+
+  // update the saved note's last edit time
+  set(
+    notesAtom,
+    notes.map((note) => {
+      // this is the note that we want to update
+      if (note.title === selectedNote.title) {
+        return {
+          ...note,
+          lastEditTime: Date.now()
+        }
+      }
+
+      return note
+    })
+  )
+})
+
 export const createEmptyNoteAtom = atom(null, async (get, set) => {
   const notes = get(notesAtom)
 
@@ -60,42 +86,22 @@ export const createEmptyNoteAtom = atom(null, async (get, set) => {
   set(selectedNoteIndexAtom, 0)
 })
 
-export const deleteNoteAtom = atom(null, (get, set) => {
+export const deleteNoteAtom = atom(null, async (get, set) => {
   const notes = get(notesAtom)
   const selectedNote = get(selectedNoteAtom)
 
   if (!selectedNote || !notes) return
 
+  const isDeleted = await window.context.deleteNote(selectedNote.title)
+
+  if (!isDeleted) return
+
+  // filter out the deleted note
   set(
     notesAtom,
     notes.filter((note) => note.title !== selectedNote.title)
   )
 
-  set(selectedNoteIndexAtom, 0)
-})
-
-export const saveNoteAtom = atom(null, async (get, set, newContent: NoteContent) => {
-  const notes = get(notesAtom)
-  const selectedNote = get(selectedNoteAtom)
-
-  if (!selectedNote || !notes) return
-
-  // Save on disk
-  await window.context.writeNote(selectedNote.title, newContent)
-
-  // Update the saved note's last the time
-  set(
-    notesAtom,
-    notes.map((note) => {
-      // This is the note that we want to update
-      if (note.title === selectedNote.title) {
-        return {
-          ...note,
-          lastEditTime: Date.now()
-        }
-      }
-
-      return note
-    })
-  )
+  // de select any note
+  set(selectedNoteIndexAtom, null)
 })

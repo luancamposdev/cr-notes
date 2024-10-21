@@ -7,11 +7,12 @@ import { deleteNoteAtom } from '@/store'
 export const DeleteNoteButton = ({ ...props }: ActionButtonProps) => {
   const deleteNote = useSetAtom(deleteNoteAtom)
 
-  const handleDeleteNote = () => {
-    deleteNote()
+  const handleDelete = async () => {
+    await deleteNote()
   }
+
   return (
-    <ActionButton {...props} onClick={handleDeleteNote}>
+    <ActionButton {...props} onClick={handleDelete}>
       <FaRegTrashCan className="w-4 h-4 text-zinc-300" />
     </ActionButton>
   )
